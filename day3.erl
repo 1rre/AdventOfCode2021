@@ -1,9 +1,10 @@
 -module(day1).
 -export([main/1]).
 -mode(compile).
- -define(INPUT, <<"input/day3">>).
+-define(INPUT, <<"input/day3">>).
 %-define(INPUT, <<"input/day3_sample">>).
 
+%% Part 1 %%
 addA(<<$1:8, Tl/binary>>) -> [{1,0}|addA(Tl)];
 addA(<<$0:8, Tl/binary>>) -> [{0,1}|addA(Tl)];
 addA(<<>>) -> [].
@@ -13,27 +14,25 @@ get_cnt([Hd|Tl]) ->
  X = get_cnt(Tl),
  [{A+B,C+D} || {{A,C},{B,D}} <- lists:zip(X, addA(Hd))].
 
-invert(<<$1:8,Tl/binary>>) -> <<$0, (invert(Tl))/binary>>;
-invert(<<$0:8,Tl/binary>>) -> <<$1, (invert(Tl))/binary>>;
-invert(<<>>) -> <<>>.
+invert([$1|Tl]) -> [$0|invert(Tl)];
+invert([$0|Tl]) -> [$1|invert(Tl)];
+invert([]) -> [].
 
 part1(List) ->
   L = get_cnt(List),
-  X = list_to_binary([if A>B -> $1; true -> $0 end || {A,B} <- L]),
-  toint(X) * toint(invert(X)).
+  X = [if A>B -> $1; true -> $0 end || {A,B} <- L],
+  list_to_integer(X, 2) * list_to_integer(invert(X), 2).
 
+%% Part 2 %%
 get_most_common([{<<Hd:8,_/binary>>, _}|Tl]) -> Hd - $0 + get_most_common(Tl);
 get_most_common([]) -> 0.
 
-toint(<<>>) -> 0;
-toint(X) ->
-  <<Hd:(byte_size(X)-1)/binary,Y:8>> = X,
-  (toint(Hd) bsl 1) + (Y band 1).
+btail(<<_:8,Tl/binary>>) -> Tl.
 
-part2([{_,X}], _) -> toint(X);
+part2([{_,X}], _) -> binary_to_integer(X, 2);
 part2(Mc, Fun) ->
   X = Fun(get_most_common(Mc), length(Mc) / 2),
-  part2([{binary:last(A1), A2} || {A1,A2} <- Mc, (binary:first(A1) =:= $1) =:= X], Fun).
+  part2([{btail(A1), A2} || {A1,A2} <- Mc, (binary:first(A1) =:= $1) =:= X], Fun).
 
 main(["1"]) ->
   {ok, Input} = file:read_file(?INPUT),
