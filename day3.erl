@@ -44,5 +44,5 @@ main(["2"]) ->
   List = [{X,X} || X <- string:split(Input, "\n", all), X /= <<"">>],
   A = part2(List, fun erlang:'>='/2),
   B = part2(List, fun erlang:'<'/2),
-  io:fwrite("~p~n", [A*B]).
+  io:fwrite("~p,~p~n~p~n", [A,B,A*B]).
 
