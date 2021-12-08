@@ -1,5 +1,4 @@
-
-@main def day5 =
+def day5 =
   def parseLine(l: String) =
     val Array(a,b) = l.split("->")
     val Array(x1,y1) = a.split(",").map(_.trim.toInt)
